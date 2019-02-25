@@ -553,12 +553,21 @@ BOOL ChangeGlobalGroup(LPWSTR wName, LPWSTR wNewName, LPWSTR wNewComment)
 	DWORD len = MAX_COMPUTERNAME_LENGTH;
 	TCHAR pszServerName[MAX_COMPUTERNAME_LENGTH];
 	GetComputerName(pszServerName, &len);
-	LPGROUP_INFO_1 pBuf = new GROUP_INFO_1;
-	pBuf->grpi1_name = wNewName;
-	pBuf->grpi1_comment = wNewComment;
+	LPGROUP_INFO_0 pBuf = new GROUP_INFO_0;
+	LPGROUP_INFO_1 pBuf1 = new GROUP_INFO_1;
+	pBuf->grpi0_name = wNewName;
+	pBuf1->grpi1_name = wName;
+	pBuf1->grpi1_comment = wNewComment;
 	NET_API_STATUS nStatus;
 
-	nStatus = NetGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf, 0);
+	nStatus = NetGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf1, 0);
+	if (nStatus != NERR_Success)
+	{
+		SetLastError(nStatus);
+		return FALSE;
+	}
+
+	nStatus = NetGroupSetInfo(pszServerName, wName, 0, (LPBYTE)pBuf, 0);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -577,12 +586,21 @@ BOOL ChangeLocalGroup(LPWSTR wName, LPWSTR wNewName, LPWSTR wNewComment)
 	DWORD len = MAX_COMPUTERNAME_LENGTH;
 	TCHAR pszServerName[MAX_COMPUTERNAME_LENGTH];
 	GetComputerName(pszServerName, &len);
-	LPLOCALGROUP_INFO_1 pBuf = new LOCALGROUP_INFO_1;
-	pBuf->lgrpi1_name = wNewName;
-	pBuf->lgrpi1_comment = wNewComment;
+	LPLOCALGROUP_INFO_0 pBuf = new LOCALGROUP_INFO_0;
+	LPLOCALGROUP_INFO_1 pBuf1 = new LOCALGROUP_INFO_1;
+	pBuf->lgrpi0_name = wNewName;
+	pBuf1->lgrpi1_name = wName;
+	pBuf1->lgrpi1_comment = wNewComment;
 	NET_API_STATUS nStatus;
 
-	nStatus = NetLocalGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf, 0);
+	nStatus = NetLocalGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf1, NULL);
+	if (nStatus != NERR_Success)
+	{
+		SetLastError(nStatus);
+		return FALSE;
+	}
+
+	nStatus = NetLocalGroupSetInfo(pszServerName, wName, 0, (LPBYTE)pBuf, NULL);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -1184,9 +1202,9 @@ int main()
 			WCHAR privilege[64];
 			cout <<
 				"--------------------------- privileges list ---------------------------" << endl <<
-				"SeAssignPrimaryTokenPrivilege"		<< "\t\t"     <<
+				"SeAssignPrimaryTokenPrivilege"     << "\t\t"     <<
 				"SeAuditPrivilege"                  << endl       <<
-				"SeBackupPrivilege"					<< "\t\t\t"   <<
+				"SeBackupPrivilege"                 << "\t\t\t"   <<
 				"SeChangeNotifyPrivilege"           << endl       <<
 				"SeCreateGlobalPrivilege"           << "\t\t\t"   <<
 				"SeCreatePagefilePrivilege"         << endl       <<
