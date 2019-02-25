@@ -1185,40 +1185,40 @@ int main()
 			cout <<
 				"--------------------------- privileges list ---------------------------" << endl <<
 				"SeAssignPrimaryTokenPrivilege"		<< "\t\t"     <<
-				"SeAuditPrivilege"					<< endl       <<
+				"SeAuditPrivilege"                  << endl       <<
 				"SeBackupPrivilege"					<< "\t\t\t"   <<
-				"SeChangeNotifyPrivilege"			<< endl       <<
-				"SeCreateGlobalPrivilege"			<< "\t\t\t"   <<
-				"SeCreatePagefilePrivilege"			<< endl       <<
-				"SeCreatePermanentPrivilege"		<< "\t\t"     <<
-				"SeCreateSymbolicLinkPrivilege"		<< endl       <<
-				"SeCreateTokenPrivilege"			<< "\t\t\t"   <<
-				"SeDebugPrivilege"					<< endl       <<
-				"SeEnableDelegationPrivilege"		<< "\t\t"     <<
-				"SeImpersonatePrivilege"			<< endl       <<
-				"SeIncreaseBasePriorityPrivilege"	<< "\t\t"     <<
-				"SeIncreaseQuotaPrivilege"			<< endl       <<
-				"SeIncreaseWorkingSetPrivilege"		<< "\t\t"     <<
-				"SeLoadDriverPrivilege"				<< endl       <<
-				"SeLockMemoryPrivilege"				<< "\t\t\t"   <<
-				"SeMachineAccountPrivilege"			<< endl       <<
-				"SeManageVolumePrivilege"			<< "\t\t\t"   <<
-				"SeProfileSingleProcessPrivilege"	<< endl       <<
-				"SeRelabelPrivilege"				<< "\t\t\t"   <<
-				"SeRemoteShutdownPrivilege"			<< endl       <<
-				"SeRestorePrivilege"				<< "\t\t\t"   <<
-				"SeSecurityPrivilege"				<< endl       <<
-				"SeShutdownPrivilege"				<< "\t\t\t"   <<
-				"SeSyncAgentPrivilege"				<< endl       <<
-				"SeSystemEnvironmentPrivilege"		<< "\t\t"     <<
-				"SeSystemProfilePrivilege"			<< endl       <<
-				"SeSystemtimePrivilege"				<< "\t\t\t"   <<
-				"SeTakeOwnershipPrivilege"			<< endl       <<
-				"SeTcbPrivilege"					<< "\t\t\t\t" <<
-				"SeTimeZonePrivilege"				<< endl       <<
-				"SeTrustedCredManAccessPrivilege"	<< "\t\t"     <<
-				"SeUndockPrivilege"					<< endl       <<
-				"SeUnsolicitedInputPrivilege"		<< "\t\t"     <<
+				"SeChangeNotifyPrivilege"           << endl       <<
+				"SeCreateGlobalPrivilege"           << "\t\t\t"   <<
+				"SeCreatePagefilePrivilege"         << endl       <<
+				"SeCreatePermanentPrivilege"        << "\t\t"     <<
+				"SeCreateSymbolicLinkPrivilege"     << endl       <<
+				"SeCreateTokenPrivilege"            << "\t\t\t"   <<
+				"SeDebugPrivilege"                  << endl       <<
+				"SeEnableDelegationPrivilege"       << "\t\t"     <<
+				"SeImpersonatePrivilege"            << endl       <<
+				"SeIncreaseBasePriorityPrivilege"   << "\t\t"     <<
+				"SeIncreaseQuotaPrivilege"          << endl       <<
+				"SeIncreaseWorkingSetPrivilege"     << "\t\t"     <<
+				"SeLoadDriverPrivilege"             << endl       <<
+				"SeLockMemoryPrivilege"             << "\t\t\t"   <<
+				"SeMachineAccountPrivilege"         << endl       <<
+				"SeManageVolumePrivilege"           << "\t\t\t"   <<
+				"SeProfileSingleProcessPrivilege"   << endl       <<
+				"SeRelabelPrivilege"                << "\t\t\t"   <<
+				"SeRemoteShutdownPrivilege"         << endl       <<
+				"SeRestorePrivilege"                << "\t\t\t"   <<
+				"SeSecurityPrivilege"               << endl       <<
+				"SeShutdownPrivilege"               << "\t\t\t"   <<
+				"SeSyncAgentPrivilege"              << endl       <<
+				"SeSystemEnvironmentPrivilege"      << "\t\t"     <<
+				"SeSystemProfilePrivilege"          << endl       <<
+				"SeSystemtimePrivilege"             << "\t\t\t"   <<
+				"SeTakeOwnershipPrivilege"          << endl       <<
+				"SeTcbPrivilege"                    << "\t\t\t\t" <<
+				"SeTimeZonePrivilege"               << endl       <<
+				"SeTrustedCredManAccessPrivilege"   << "\t\t"     <<
+				"SeUndockPrivilege"                 << endl       <<
+				"SeUnsolicitedInputPrivilege"       << "\t\t"     <<
 				"SeInteractiveLogonRight"           << endl       <<
 				"-----------------------------------------------------------------------" << endl;
 			cout << "Enter privilege\n> ";
