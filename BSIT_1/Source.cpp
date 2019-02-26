@@ -4,9 +4,63 @@
 #include <sddl.h>
 #include <ntsecapi.h> 
 
-#pragma comment(lib, "netapi32.lib")
+//#pragma comment(lib, "netapi32.lib")
 
 using namespace std;
+
+DWORD (*_NetUserEnum)            (LPCWSTR servername, DWORD level,       DWORD   filter, LPBYTE *bufptr,   DWORD prefmaxlen,    LPDWORD entriesread,  LPDWORD totalentries, PDWORD resume_handle);
+DWORD (*_NetUserGetLocalGroups)  (LPCWSTR servername, LPCWSTR username,  DWORD level,    DWORD flags,      LPBYTE *bufptr,      DWORD prefmaxlen,     LPDWORD entriesread,  LPDWORD totalentries);
+DWORD (*_NetLocalGroupEnum)      (LPCWSTR servername, DWORD level,       LPBYTE *bufptr, DWORD prefmaxlen, LPDWORD entriesread, LPDWORD totalentries, PDWORD_PTR resumehandle);
+DWORD (*_NetUserGetGroups)       (LPCWSTR servername, LPCWSTR username,  DWORD level,    LPBYTE *bufptr,   DWORD prefmaxlen,    LPDWORD entriesread,  LPDWORD totalentries);
+DWORD (*_NetGroupEnum)           (LPCWSTR servername, DWORD level,       LPBYTE *bufptr, DWORD prefmaxlen, LPDWORD entriesread, LPDWORD totalentries, PDWORD_PTR resume_handle);
+DWORD (*_NetUserSetInfo)         (LPCWSTR servername, LPCWSTR username,  DWORD level,	 LPBYTE  buf,      LPDWORD parm_err);
+DWORD (*_NetLocalGroupSetInfo)   (LPCWSTR servername, LPCWSTR groupname, DWORD level,    LPBYTE buf,       LPDWORD parm_err);
+DWORD (*_NetLocalGroupAddMembers)(LPCWSTR servername, LPCWSTR groupname, DWORD level,    LPBYTE buf,       DWORD totalentries);
+DWORD (*_NetLocalGroupDelMembers)(LPCWSTR servername, LPCWSTR groupname, DWORD level,    LPBYTE buf,       DWORD totalentries);
+DWORD (*_NetGroupSetInfo)        (LPCWSTR servername, LPCWSTR groupname, DWORD level,    LPBYTE buf,       LPDWORD parm_err);
+DWORD (*_NetUserGetInfo)         (LPCWSTR servername, LPCWSTR username,  DWORD level,    LPBYTE *bufptr);
+DWORD (*_NetUserAdd)             (LPCWSTR servername, DWORD level,       LPBYTE buf,     LPDWORD parm_err);
+DWORD (*_NetGroupAdd)            (LPCWSTR servername, DWORD level,       LPBYTE buf,     LPDWORD parm_err);
+DWORD (*_NetLocalGroupAdd)       (LPCWSTR servername, DWORD level,       LPBYTE buf,     LPDWORD parm_err);
+DWORD (*_NetGroupAddUser)        (LPCWSTR servername, LPCWSTR GroupName, LPCWSTR username);
+DWORD (*_NetGroupDelUser)        (LPCWSTR servername, LPCWSTR GroupName, LPCWSTR Username);
+DWORD (*_NetGroupDel)            (LPCWSTR servername, LPCWSTR groupname);
+DWORD (*_NetLocalGroupDel)       (LPCWSTR servername, LPCWSTR groupname);
+DWORD (*_NetUserDel)             (LPCWSTR servername, LPCWSTR username);
+
+
+BOOL InitDynamicLibrary()
+{
+	HMODULE hLib;
+	hLib = LoadLibrary(L"netapi32.dll");
+	if (hLib == NULL)
+	{
+		return FALSE;
+	}
+
+	(FARPROC &)_NetLocalGroupAddMembers = GetProcAddress(hLib, "NetLocalGroupAddMembers");
+	(FARPROC &)_NetLocalGroupDelMembers = GetProcAddress(hLib, "NetLocalGroupDelMembers");
+	(FARPROC &)_NetUserGetLocalGroups   = GetProcAddress(hLib, "NetUserGetLocalGroups");
+	(FARPROC &)_NetLocalGroupSetInfo    = GetProcAddress(hLib, "NetLocalGroupSetInfo");
+	(FARPROC &)_NetLocalGroupEnum       = GetProcAddress(hLib, "NetLocalGroupEnum");
+	(FARPROC &)_NetUserGetGroups        = GetProcAddress(hLib, "NetUserGetGroups");
+	(FARPROC &)_NetLocalGroupAdd        = GetProcAddress(hLib, "NetLocalGroupAdd");
+	(FARPROC &)_NetLocalGroupDel        = GetProcAddress(hLib, "NetLocalGroupDel");
+	(FARPROC &)_NetGroupSetInfo         = GetProcAddress(hLib, "NetGroupSetInfo");
+	(FARPROC &)_NetGroupAddUser         = GetProcAddress(hLib, "NetGroupAddUser");
+	(FARPROC &)_NetGroupDelUser         = GetProcAddress(hLib, "NetGroupDelUser");
+	(FARPROC &)_NetUserGetInfo          = GetProcAddress(hLib, "NetUserGetInfo");
+	(FARPROC &)_NetUserSetInfo          = GetProcAddress(hLib, "NetUserSetInfo");
+	(FARPROC &)_NetGroupEnum            = GetProcAddress(hLib, "NetGroupEnum");
+	(FARPROC &)_NetUserEnum             = GetProcAddress(hLib, "NetUserEnum");
+	(FARPROC &)_NetGroupAdd             = GetProcAddress(hLib, "NetGroupAdd");
+	(FARPROC &)_NetGroupDel             = GetProcAddress(hLib, "NetGroupDel");
+	(FARPROC &)_NetUserAdd              = GetProcAddress(hLib, "NetUserAdd");
+	(FARPROC &)_NetUserDel              = GetProcAddress(hLib, "NetUserDel");
+
+
+	return TRUE;
+}
 
 void ErrorOutput()
 {
@@ -119,7 +173,7 @@ void UsersInfo()
 	TCHAR pszServerName[MAX_COMPUTERNAME_LENGTH];
 	GetComputerName(pszServerName, &len);
 
-	nStatus = NetUserEnum(
+	nStatus = _NetUserEnum(
 		(LPCWSTR)pszServerName,
 		0,
 		FILTER_NORMAL_ACCOUNT,
@@ -139,7 +193,7 @@ void UsersInfo()
 				fprintf(stderr, "An access violation has occurred\n");
 				break;
 			}
-			NetUserGetInfo((LPCWSTR)pszServerName, pTmpBuf->usri0_name, 4, (LPBYTE*)&pTmpBuf1);
+			_NetUserGetInfo((LPCWSTR)pszServerName, pTmpBuf->usri0_name, 4, (LPBYTE*)&pTmpBuf1);
 			TCHAR priv[16];
 			if (pTmpBuf1->usri4_priv == USER_PRIV_GUEST)
 			{
@@ -162,7 +216,7 @@ void UsersInfo()
 					 "SID:\t\t"    << pSID                                                                         << endl <<
 					 "Type:\t\t"   << priv                                                                         << endl;
 
-			NetUserGetGroups((LPCWSTR)pszServerName, pTmpBuf->usri0_name, 1, (LPBYTE*)&pBuf1, MAX_PREFERRED_LENGTH, &dwEntriesRead1, &dwTotalEntries);
+			_NetUserGetGroups((LPCWSTR)pszServerName, pTmpBuf->usri0_name, 1, (LPBYTE*)&pBuf1, MAX_PREFERRED_LENGTH, &dwEntriesRead1, &dwTotalEntries);
 			wcout << "Global group:\t" << pBuf1->grui1_name << endl << 
 					 "Attributes:\t";
 			switch (pBuf1->grui1_attributes)
@@ -221,7 +275,7 @@ void UsersInfo()
 
 			DWORD dwFlags = LG_INCLUDE_INDIRECT;
 
-			nStatus = NetUserGetLocalGroups((LPCWSTR)pszServerName, pTmpBuf->usri0_name, 0, dwFlags, (LPBYTE *)&pBuf2, MAX_PREFERRED_LENGTH, &dwEntriesRead1, &dwTotalEntries);
+			nStatus = _NetUserGetLocalGroups((LPCWSTR)pszServerName, pTmpBuf->usri0_name, 0, dwFlags, (LPBYTE *)&pBuf2, MAX_PREFERRED_LENGTH, &dwEntriesRead1, &dwTotalEntries);
 
 			if (nStatus == NERR_Success)
 			{
@@ -331,7 +385,7 @@ BOOL AddMachineAccount(LPWSTR wAccount, LPWSTR wPassword)
 
 	GetComputerName(wTargetComputer, &len);
 
-	dwError = NetUserAdd(
+	dwError = _NetUserAdd(
 		wTargetComputer,    // target computer name
 		1,                  // info level
 		(LPBYTE)&ui,		// buffer
@@ -357,7 +411,7 @@ BOOL DeleteAccount(LPWSTR wAccount)
 	GetComputerName(pszServerName, &i);
 	NET_API_STATUS nStatus;
 
-	nStatus = NetUserDel(pszServerName, wAccount);
+	nStatus = _NetUserDel(pszServerName, wAccount);
 	
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -384,14 +438,14 @@ BOOL ChangeAccount(LPWSTR wName, LPWSTR wNewName, LPWSTR wPassword)
 
 	NET_API_STATUS nStatus;
 
-	nStatus = NetUserSetInfo(pszServerName, wName, 0, (LPBYTE)uiName, 0);
+	nStatus = _NetUserSetInfo(pszServerName, wName, 0, (LPBYTE)uiName, 0);
 	if (nStatus != NERR_Success)
 	{
 		SetLastError(nStatus);
 		return FALSE;
 	}
 
-	nStatus = NetUserSetInfo(pszServerName, wNewName, 1003, (LPBYTE)uiPass, 0);
+	nStatus = _NetUserSetInfo(pszServerName, wNewName, 1003, (LPBYTE)uiPass, 0);
 	if (nStatus != NERR_Success)
 	{
 		SetLastError(nStatus);
@@ -411,7 +465,7 @@ void GroupsInfo()
 	DWORD dwEntriesRead = 0;
 	DWORD dwTotalEntries = 0;
 	DWORD dwResumeHandle = 0;
-	nStatus = NetGroupEnum((LPCWSTR)pszServerName, 0, (LPBYTE *)&pBuf, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, &dwResumeHandle);
+	nStatus = _NetGroupEnum((LPCWSTR)pszServerName, 0, (LPBYTE *)&pBuf, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, &dwResumeHandle);
 	if (nStatus == NERR_Success)
 	{
 		LPGROUP_INFO_0 pTmpBuf;
@@ -437,7 +491,7 @@ void GroupsInfo()
 	}
 
 	LPLOCALGROUP_INFO_1 pBuf1;
-	nStatus = NetLocalGroupEnum((LPCWSTR)pszServerName, 1, (LPBYTE *)&pBuf1, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, &dwResumeHandle);
+	nStatus = _NetLocalGroupEnum((LPCWSTR)pszServerName, 1, (LPBYTE *)&pBuf1, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, &dwResumeHandle);
 	if (nStatus == NERR_Success)
 	{
 		LPLOCALGROUP_INFO_1 pTmpBuf1;
@@ -469,7 +523,7 @@ BOOL AddGlobalGroup(LPWSTR wName)
 	pBuf->grpi0_name = wName;
 	NET_API_STATUS nStatus;
 
-	nStatus = NetGroupAdd(pszServerName, 0, (LPBYTE)pBuf, 0);
+	nStatus = _NetGroupAdd(pszServerName, 0, (LPBYTE)pBuf, 0);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -492,7 +546,7 @@ BOOL AddLocalGroup(LPWSTR wName)
 	pBuf->lgrpi0_name = wName;
 	NET_API_STATUS nStatus;
 
-	nStatus = NetLocalGroupAdd(pszServerName, 0, (LPBYTE)pBuf, 0);
+	nStatus = _NetLocalGroupAdd(pszServerName, 0, (LPBYTE)pBuf, 0);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -513,7 +567,7 @@ BOOL DeleteGlobalGroup(LPWSTR wName)
 	GetComputerName(pszServerName, &i);
 	NET_API_STATUS nStatus;
 
-	nStatus = NetGroupDel(pszServerName, wName);
+	nStatus = _NetGroupDel(pszServerName, wName);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -534,7 +588,7 @@ BOOL DeleteLocalGroup(LPWSTR wName)
 	GetComputerName(pszServerName, &len);
 	NET_API_STATUS nStatus;
 
-	nStatus = NetLocalGroupDel(pszServerName, wName);
+	nStatus = _NetLocalGroupDel(pszServerName, wName);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -560,14 +614,14 @@ BOOL ChangeGlobalGroup(LPWSTR wName, LPWSTR wNewName, LPWSTR wNewComment)
 	pBuf1->grpi1_comment = wNewComment;
 	NET_API_STATUS nStatus;
 
-	nStatus = NetGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf1, 0);
+	nStatus = _NetGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf1, 0);
 	if (nStatus != NERR_Success)
 	{
 		SetLastError(nStatus);
 		return FALSE;
 	}
 
-	nStatus = NetGroupSetInfo(pszServerName, wName, 0, (LPBYTE)pBuf, 0);
+	nStatus = _NetGroupSetInfo(pszServerName, wName, 0, (LPBYTE)pBuf, 0);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -593,14 +647,14 @@ BOOL ChangeLocalGroup(LPWSTR wName, LPWSTR wNewName, LPWSTR wNewComment)
 	pBuf1->lgrpi1_comment = wNewComment;
 	NET_API_STATUS nStatus;
 
-	nStatus = NetLocalGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf1, NULL);
+	nStatus = _NetLocalGroupSetInfo(pszServerName, wName, 1, (LPBYTE)pBuf1, NULL);
 	if (nStatus != NERR_Success)
 	{
 		SetLastError(nStatus);
 		return FALSE;
 	}
 
-	nStatus = NetLocalGroupSetInfo(pszServerName, wName, 0, (LPBYTE)pBuf, NULL);
+	nStatus = _NetLocalGroupSetInfo(pszServerName, wName, 0, (LPBYTE)pBuf, NULL);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -621,7 +675,7 @@ BOOL AddAccountToGlobalGroup(LPWSTR wUsername, LPWSTR wGroup)
 	GetComputerName(pszServerName, &len);
 	NET_API_STATUS nStatus;
 
-	nStatus = NetGroupAddUser(pszServerName, wGroup, wUsername);
+	nStatus = _NetGroupAddUser(pszServerName, wGroup, wUsername);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -644,7 +698,7 @@ BOOL AddAccountToLocalGroup(LPWSTR wUsername, LPWSTR wGroup)
 	pBuf->lgrmi3_domainandname = wUsername;
 	NET_API_STATUS nStatus;
 
-	nStatus = NetLocalGroupAddMembers(pszServerName, wGroup, 3, (LPBYTE)pBuf, 1);
+	nStatus = _NetLocalGroupAddMembers(pszServerName, wGroup, 3, (LPBYTE)pBuf, 1);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -665,7 +719,7 @@ BOOL DeleteAccountFromGlobalGroup(LPWSTR wUsername, LPWSTR wGroup)
 	GetComputerName(pszServerName, &i);
 	NET_API_STATUS nStatus;
 
-	nStatus = NetGroupDelUser(pszServerName, wGroup, wUsername);
+	nStatus = _NetGroupDelUser(pszServerName, wGroup, wUsername);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -687,7 +741,7 @@ BOOL DeleteAccountFromLocalGroup(LPWSTR wUsername, LPWSTR wGroup)
 	LPLOCALGROUP_MEMBERS_INFO_3 pBuf = new LOCALGROUP_MEMBERS_INFO_3;
 	pBuf->lgrmi3_domainandname = wUsername;
 	NET_API_STATUS nStatus;
-	nStatus = NetLocalGroupDelMembers(pszServerName, wGroup, 3, (LPBYTE)pBuf, 1);
+	nStatus = _NetLocalGroupDelMembers(pszServerName, wGroup, 3, (LPBYTE)pBuf, 1);
 
 	// Indicate whether the function was successful.
 	if (nStatus == NERR_Success)
@@ -848,6 +902,13 @@ int main()
 	WCHAR sAdmins[32] = L"Администраторы";
 	WCHAR sUsers[32]  = L"Пользователи";
 	WCHAR sGuests[32] = L"Гости";
+
+	if (!InitDynamicLibrary())
+	{
+		cout << "Error in library\n";
+		system("pause");
+		return 0;
+	}
 
 	int mode = 0;
 
