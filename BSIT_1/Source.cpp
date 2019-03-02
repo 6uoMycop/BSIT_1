@@ -575,31 +575,7 @@ void GroupsInfo()
 			}
 		}
 	}
-	/*
-	LPLOCALGROUP_INFO_1 pBuf1;
-	nStatus = __NetLocalGroupEnum((LPCWSTR)pszServerName, 1, (LPBYTE *)&pBuf1, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, &dwResumeHandle);
-	if (nStatus == NERR_Success)
-	{
-		LPLOCALGROUP_INFO_1 pTmpBuf1;
 
-		if ((pTmpBuf1 = pBuf1) != NULL)
-		{
-			cout << "Local group_s:" << endl;
-
-			for (unsigned int i = 0; i < dwEntriesRead; i++)
-			{
-				if (pTmpBuf1 == NULL)
-				{
-					fprintf(stderr, "An access violation has occurred\n");
-					break;
-				}
-				wcout << L"Name:\t\t" << pTmpBuf1->lgrpi1_name << endl << "Comment:\t" << pTmpBuf1->lgrpi1_comment << endl;
-				pTmpBuf1++;
-			}
-		}
-	}
-	*/
-	
 	PLOCALGROUP_INFO_0 pBuf11 = NULL;
 	PLOCALGROUP_INFO_0 pTmpBuf11 = NULL;
 	PGROUP_INFO_3 bufff = NULL;
